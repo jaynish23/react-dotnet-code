@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ext JS Example (CDN from cdnjs)</title>
+    
+    <!-- Include Ext JS CSS from cdnjs -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/extjs/6.5.3/resources/ext-all.css" />
+</head>
+<body>
+    <div id="buttonContainer"></div>
+
+    <!-- Include Ext JS JavaScript from cdnjs -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/extjs/6.5.3/ext-all.js"></script>
+
+    <!-- Your Custom JavaScript Code -->
+    <script>
+        Ext.onReady(function() {
+            Ext.create('Ext.Button', {
+                text: 'Click Me',
+                renderTo: 'buttonContainer',
+                handler: function() {
+                    alert('Button Clicked!');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

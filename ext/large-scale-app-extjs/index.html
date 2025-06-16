@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Large Scale App (Ext JS)</title>
+    <!-- Ext JS Local Files -->
+    <!-- <link rel="stylesheet" href="ext-7.6.0/build/classic/theme-triton/resources/theme-triton-all.css">
+    <script src="ext-7.6.0/build/ext-all.js"></script>
+    <script src="ext-7.6.0/build/classic/theme-triton/theme-triton.js"></script> -->
+      
+    <link rel="stylesheet" href="./ext-all.css" />
+    <script src="./ext-all-debug.js"></script>
+    <!-- Custom Styles -->
+    <style>
+        body {
+            padding: 20px;
+            font-family: Arial, sans-serif;
+        }
+
+        .button-container {
+            margin-bottom: 20px;
+        }
+
+        .error-message {
+            color: red;
+            margin-bottom: 10px;
+        }
+
+        .x-grid-view {
+            overflow-x: auto !important;
+        }
+    </style>
+</head>
+
+<body>
+    <script>
+        Ext.onReady(function () {
+            // Define the data model for each entity
+            Ext.define('App.model.Entity', {
+                extend: 'Ext.data.Model',
+                fields: [
+                    { name: 'id', type: 'int' },
+                    // Common fields for all entities
+                    'productName', 'category', 'price', 'stock', 'createdDate', 'lastUpdated', 'description',
+                    'manufacturer', 'sku', 'weight', 'dimensions', 'color', 'material', 'warrantyMonths',
+                    'isActive', 'rating', 'discount', 'supplierId', 'batchNumber', 'expiryDate',
+                    'countryOfOrigin', 'isFeatured', 'maxOrderQuantity', 'leadTimeDays',
+                    // Orders-specific fields
+                    'orderDate', 'customerId', 'totalAmount', 'status', 'shippingAddress', 'billingAddress',
+                    'paymentMethod', 'orderNumber', 'expectedDelivery', 'actualDelivery', 'isDelivered',
+                    'taxAmount', 'discountAmount', 'shippingCost', 'orderNotes', 'createdBy', 'modifiedBy',
+                    'modifiedDate', 'customerEmail', 'customerPhone', 'orderPriority', 'shippingMethod',
+                    'trackingNumber', 'couponCode', 'isGift', 'giftMessage', 'salesChannel', 'orderWeight',
+                    // Customers-specific fields
+                    'firstName', 'lastName', 'email', 'phone', 'addressLine1', 'addressLine2', 'city', 'state',
+                    'zipCode', 'country', 'dateOfBirth', 'gender', 'occupation', 'companyName', 'annualIncome',
+                    'customerType', 'loyaltyPoints', 'lastPurchaseDate', 'newsletterSubscribed',
+                    'preferredContactMethod', 'accountStatus', 'creditLimit', 'taxId', 'customerSegment',
+                    'registrationDate', 'lastLoginDate', 'preferredLanguage', 'timeZone', 'notes',
+                    'emergencyContact', 'emergencyPhone', 'referralSource', 'socialMediaHandle', 'website',
+                    'fax', 'isVerified', 'verificationDate', 'lastContacted', 'customerRating',
+                    // Inventory-specific fields
+                    'productId', 'warehouseId', 'quantity', 'stockStatus', 'reorderLevel', 'reorderQuantity',
+                    'lastRestockDate', 'storageLocation', 'unitCost', 'totalCost', 'isDamaged', 'damageNotes',
+                    'lastAuditDate', 'auditStatus', 'inventoryType',
+                    // Suppliers-specific fields
+                    'companyName', 'contactName', 'supplierType', 'leadTimeDays', 'minOrderQuantity',
+                    'maxOrderQuantity', 'paymentTerms', 'contractStartDate', 'contractEndDate',
+                    'preferredContactMethod', 'lastOrderDate', 'supplierCategory'
+                ]
+            });
+
+            // Define the store to fetch data
+            var store = Ext.create('Ext.data.Store', {
+                model: 'App.model.Entity',
+                pageSize: 1000,
+                proxy: {
+                    type: 'ajax',
+                    url: 'http://localhost:5189/api/Products', // Default URL, will be updated
+                    reader: {
+                        type: 'json',
+                        rootProperty: ''
+                    }
+                },
+                autoLoad: false
+            });
+
+            // Column definitions for each entity
+            var columns = {
+                Products: [
+                    { text: 'ID', dataIndex: 'id', width: 90 },
+                    { text: 'Product Name', dataIndex: 'productName', width: 150 },
+                    { text: 'Category', dataIndex: 'category', width: 150 },
+                    { text: 'Price', dataIndex: 'price', width: 120 },
+                    { text: 'Stock', dataIndex: 'stock', width: 100 },
+                    { text: 'Created Date', dataIndex: 'createdDate', width: 150 },
+                    { text: 'Last Updated', dataIndex: 'lastUpdated', width: 150 },
+                    { text: 'Description', dataIndex: 'description', width: 200 },
+                    { text: 'Manufacturer', dataIndex: 'manufacturer', width: 150 },
+                    { text: 'SKU', dataIndex: 'sku', width: 120 },
+                    { text: 'Weight', dataIndex: 'weight', width: 100 },
+                    { text: 'Dimensions', dataIndex: 'dimensions', width: 150 },
+                    { text: 'Color', dataIndex: 'color', width: 120 },
+                    { text: 'Material', dataIndex: 'material', width: 120 },
+                    { text: 'Warranty Months', dataIndex: 'warrantyMonths', width: 120 },
+                    { text: 'Is Active', dataIndex: 'isActive', width: 100 },
+                    { text: 'Rating', dataIndex: 'rating', width: 100 },
+                    { text: 'Discount', dataIndex: 'discount', width: 100 },
+                    { text: 'Supplier ID', dataIndex: 'supplierId', width: 100 },
+                    { text: 'Batch Number', dataIndex: 'batchNumber', width: 120 },
+                    { text: 'Expiry Date', dataIndex: 'expiryDate', width: 150 },
+                    { text: 'Country of Origin', dataIndex: 'countryOfOrigin', width: 150 },
+                    { text: 'Is Featured', dataIndex: 'isFeatured', width: 100 },
+                    { text: 'Max Order Quantity', dataIndex: 'maxOrderQuantity', width: 120 },
+                    { text: 'Lead Time Days', dataIndex: 'leadTimeDays', width: 120 }
+                ],
+                Orders: [
+                    { text: 'ID', dataIndex: 'id', width: 90 },
+                    { text: 'Order Date', dataIndex: 'orderDate', width: 150 },
+                    { text: 'Customer ID', dataIndex: 'customerId', width: 120 },
+                    { text: 'Total Amount', dataIndex: 'totalAmount', width: 120 },
+                    { text: 'Status', dataIndex: 'status', width: 120 },
+                    { text: 'Shipping Address', dataIndex: 'shippingAddress', width: 200 },
+                    { text: 'Billing Address', dataIndex: 'billingAddress', width: 200 },
+                    { text: 'Payment Method', dataIndex: 'paymentMethod', width: 150 },
+                    { text: 'Order Number', dataIndex: 'orderNumber', width: 120 },
+                    { text: 'Expected Delivery', dataIndex: 'expectedDelivery', width: 150 },
+                    { text: 'Actual Delivery', dataIndex: 'actualDelivery', width: 150 },
+                    { text: 'Is Delivered', dataIndex: 'isDelivered', width: 100 },
+                    { text: 'Tax Amount', dataIndex: 'taxAmount', width: 120 },
+                    { text: 'Discount Amount', dataIndex: 'discountAmount', width: 120 },
+                    { text: 'Shipping Cost', dataIndex: 'shippingCost', width: 120 },
+                    { text: 'Order Notes', dataIndex: 'orderNotes', width: 200 },
+                    { text: 'Created By', dataIndex: 'createdBy', width: 150 },
+                    { text: 'Modified By', dataIndex: 'modifiedBy', width: 150 },
+                    { text: 'Created Date', dataIndex: 'createdDate', width: 150 },
+                    { text: 'Modified Date', dataIndex: 'modifiedDate', width: 150 },
+                    { text: 'Customer Email', dataIndex: 'customerEmail', width: 200 },
+                    { text: 'Customer Phone', dataIndex: 'customerPhone', width: 150 },
+                    { text: 'Order Priority', dataIndex: 'orderPriority', width: 120 },
+                    { text: 'Shipping Method', dataIndex: 'shippingMethod', width: 150 },
+                    { text: 'Tracking Number', dataIndex: 'trackingNumber', width: 150 },
+                    { text: 'Coupon Code', dataIndex: 'couponCode', width: 120 },
+                    { text: 'Is Gift', dataIndex: 'isGift', width: 100 },
+                    { text: 'Gift Message', dataIndex: 'giftMessage', width: 200 },
+                    { text: 'Sales Channel', dataIndex: 'salesChannel', width: 150 },
+                    { text: 'Order Weight', dataIndex: 'orderWeight', width: 120 }
+                ],
+                Customers: [
+                    { text: 'ID', dataIndex: 'id', width: 90 },
+                    { text: 'First Name', dataIndex: 'firstName', width: 150 },
+                    { text: 'Last Name', dataIndex: 'lastName', width: 150 },
+                    { text: 'Email', dataIndex: 'email', width: 200 },
+                    { text: 'Phone', dataIndex: 'phone', width: 150 },
+                    { text: 'Address Line 1', dataIndex: 'addressLine1', width: 200 },
+                    { text: 'Address Line 2', dataIndex: 'addressLine2', width: 200 },
+                    { text: 'City', dataIndex: 'city', width: 120 },
+                    { text: 'State', dataIndex: 'state', width: 120 },
+                    { text: 'Zip Code', dataIndex: 'zipCode', width: 120 },
+                    { text: 'Country', dataIndex: 'country', width: 120 },
+                    { text: 'Created Date', dataIndex: 'createdDate', width: 150 },
+                    { text: 'Last Updated', dataIndex: 'lastUpdated', width: 150 },
+                    { text: 'Is Active', dataIndex: 'isActive', width: 100 },
+                    { text: 'Date of Birth', dataIndex: 'dateOfBirth', width: 150 },
+                    { text: 'Gender', dataIndex: 'gender', width: 100 },
+                    { text: 'Occupation', dataIndex: 'occupation', width: 150 },
+                    { text: 'Company Name', dataIndex: 'companyName', width: 150 },
+                    { text: 'Annual Income', dataIndex: 'annualIncome', width: 120 },
+                    { text: 'Customer Type', dataIndex: 'customerType', width: 120 },
+                    { text: 'Loyalty Points', dataIndex: 'loyaltyPoints', width: 120 },
+                    { text: 'Last Purchase Date', dataIndex: 'lastPurchaseDate', width: 150 },
+                    { text: 'Newsletter Subscribed', dataIndex: 'newsletterSubscribed', width: 120 },
+                    { text: 'Preferred Contact Method', dataIndex: 'preferredContactMethod', width: 150 },
+                    { text: 'Account Status', dataIndex: 'accountStatus', width: 120 },
+                    { text: 'Credit Limit', dataIndex: 'creditLimit', width: 120 },
+                    { text: 'Billing Address', dataIndex: 'billingAddress', width: 200 },
+                    { text: 'Shipping Address', dataIndex: 'shippingAddress', width: 200 },
+                    { text: 'Tax ID', dataIndex: 'taxId', width: 120 },
+                    { text: 'Customer Segment', dataIndex: 'customerSegment', width: 120 },
+                    { text: 'Registration Date', dataIndex: 'registrationDate', width: 150 },
+                    { text: 'Last Login Date', dataIndex: 'lastLoginDate', width: 150 },
+                    { text: 'Preferred Language', dataIndex: 'preferredLanguage', width: 120 },
+                    { text: 'Time Zone', dataIndex: 'timeZone', width: 120 },
+                    { text: 'Notes', dataIndex: 'notes', width: 200 },
+                    { text: 'Emergency Contact', dataIndex: 'emergencyContact', width: 150 },
+                    { text: 'Emergency Phone', dataIndex: 'emergencyPhone', width: 150 },
+                    { text: 'Referral Source', dataIndex: 'referralSource', width: 150 },
+                    { text: 'Social Media Handle', dataIndex: 'socialMediaHandle', width: 150 },
+                    { text: 'Website', dataIndex: 'website', width: 200 },
+                    { text: 'Fax', dataIndex: 'fax', width: 120 },
+                    { text: 'Is Verified', dataIndex: 'isVerified', width: 100 },
+                    { text: 'Verification Date', dataIndex: 'verificationDate', width: 150 },
+                    { text: 'Last Contacted', dataIndex: 'lastContacted', width: 150 },
+                    { text: 'Customer Rating', dataIndex: 'customerRating', width: 120 }
+                ],
+                Inventory: [
+                    { text: 'ID', dataIndex: 'id', width: 90 },
+                    { text: 'Product ID', dataIndex: 'productId', width: 120 },
+                    { text: 'Warehouse ID', dataIndex: 'warehouseId', width: 120 },
+                    { text: 'Quantity', dataIndex: 'quantity', width: 120 },
+                    { text: 'Last Updated', dataIndex: 'lastUpdated', width: 150 },
+                    { text: 'Stock Status', dataIndex: 'stockStatus', width: 120 },
+                    { text: 'Reorder Level', dataIndex: 'reorderLevel', width: 120 },
+                    { text: 'Reorder Quantity', dataIndex: 'reorderQuantity', width: 120 },
+                    { text: 'Last Restock Date', dataIndex: 'lastRestockDate', width: 150 },
+                    { text: 'Supplier ID', dataIndex: 'supplierId', width: 120 },
+                    { text: 'Batch Number', dataIndex: 'batchNumber', width: 120 },
+                    { text: 'Expiry Date', dataIndex: 'expiryDate', width: 150 },
+                    { text: 'Storage Location', dataIndex: 'storageLocation', width: 150 },
+                    { text: 'Unit Cost', dataIndex: 'unitCost', width: 120 },
+                    { text: 'Total Cost', dataIndex: 'totalCost', width: 120 },
+                    { text: 'Is Damaged', dataIndex: 'isDamaged', width: 100 },
+                    { text: 'Damage Notes', dataIndex: 'damageNotes', width: 200 },
+                    { text: 'Last Audit Date', dataIndex: 'lastAuditDate', width: 150 },
+                    { text: 'Audit Status', dataIndex: 'auditStatus', width: 120 },
+                    { text: 'Inventory Type', dataIndex: 'inventoryType', width: 120 }
+                ],
+                Suppliers: [
+                    { text: 'ID', dataIndex: 'id', width: 90 },
+                    { text: 'Company Name', dataIndex: 'companyName', width: 150 },
+                    { text: 'Contact Name', dataIndex: 'contactName', width: 150 },
+                    { text: 'Email', dataIndex: 'email', width: 200 },
+                    { text: 'Phone', dataIndex: 'phone', width: 150 },
+                    { text: 'Address Line 1', dataIndex: 'addressLine1', width: 200 },
+                    { text: 'Address Line 2', dataIndex: 'addressLine2', width: 200 },
+                    { text: 'City', dataIndex: 'city', width: 120 },
+                    { text: 'State', dataIndex: 'state', width: 120 },
+                    { text: 'Zip Code', dataIndex: 'zipCode', width: 120 },
+                    { text: 'Country', dataIndex: 'country', width: 120 },
+                    { text: 'Created Date', dataIndex: 'createdDate', width: 150 },
+                    { text: 'Last Updated', dataIndex: 'lastUpdated', width: 150 },
+                    { text: 'Is Active', dataIndex: 'isActive', width: 100 },
+                    { text: 'Supplier Type', dataIndex: 'supplierType', width: 120 },
+                    { text: 'Lead Time Days', dataIndex: 'leadTimeDays', width: 120 },
+                    { text: 'Min Order Quantity', dataIndex: 'minOrderQuantity', width: 120 },
+                    { text: 'Max Order Quantity', dataIndex: 'maxOrderQuantity', width: 120 },
+                    { text: 'Payment Terms', dataIndex: 'paymentTerms', width: 150 },
+                    { text: 'Tax ID', dataIndex: 'taxId', width: 120 },
+                    { text: 'Website', dataIndex: 'website', width: 200 },
+                    { text: 'Rating', dataIndex: 'rating', width: 100 },
+                    { text: 'Contract Start Date', dataIndex: 'contractStartDate', width: 150 },
+                    { text: 'Contract End Date', dataIndex: 'contractEndDate', width: 150 },
+                    { text: 'Notes', dataIndex: 'notes', width: 200 },
+                    { text: 'Preferred Contact Method', dataIndex: 'preferredContactMethod', width: 150 },
+                    { text: 'Last Order Date', dataIndex: 'lastOrderDate', width: 150 },
+                    { text: 'Supplier Category', dataIndex: 'supplierCategory', width: 150 }
+                ]
+            };
+
+            // Create the application
+            Ext.create('Ext.container.Viewport', {
+                layout: 'fit',
+                items: [{
+                    xtype: 'panel',
+                    title: 'Large Scale App (Ext JS)',
+                    layout: 'vbox',
+                    items: [{
+                        xtype: 'container',
+                        cls: 'button-container',
+                        items: [{
+                            xtype: 'button',
+                            text: 'Products',
+                            margin: '0 5 0 0',
+                            handler: function () { selectEntity('Products'); }
+                        }, {
+                            xtype: 'button',
+                            text: 'Orders',
+                            margin: '0 5 0 0',
+                            handler: function () { selectEntity('Orders'); }
+                        }, {
+                            xtype: 'button',
+                            text: 'Customers',
+                            margin: '0 5 0 0',
+                            handler: function () { selectEntity('Customers'); }
+                        }, {
+                            xtype: 'button',
+                            text: 'Inventory',
+                            margin: '0 5 0 0',
+                            handler: function () { selectEntity('Inventory'); }
+                        }, {
+                            xtype: 'button',
+                            text: 'Suppliers',
+                            margin: '0 5 0 0',
+                            handler: function () { selectEntity('Suppliers'); }
+                        }]
+                    }, {
+                        xtype: 'component',
+                        itemId: 'errorMessage',
+                        cls: 'error-message',
+                        hidden: true,
+                        html: ''
+                    }, {
+                        xtype: 'grid',
+                        itemId: 'dataGrid',
+                        store: store,
+                        columns: [],
+                        height: 600,
+                        width: '100%',
+                        hidden: true,
+                        viewConfig: {
+                            loadMask: true // Enables loading spinner
+                        },
+                        bbar: {
+                            xtype: 'toolbar',
+                            itemId: 'pagingToolbar',
+                            items: [{
+                                xtype: 'button',
+                                text: 'Previous',
+                                itemId: 'prevButton',
+                                disabled: true,
+                                handler: function () { previousPage(); }
+                            }, {
+                                xtype: 'button',
+                                text: 'Next',
+                                itemId: 'nextButton',
+                                disabled: true,
+                                handler: function () { nextPage(); }
+                            }, {
+                                xtype: 'tbtext',
+                                itemId: 'pageInfo',
+                                text: ''
+                            }]
+                        },
+                        listeners: {
+                            afterrender: function () {
+                                this.getView().on('refresh', function () {
+                                    // Ensure horizontal scrolling after data load
+                                    this.getEl().down('.x-grid-view').setStyle('overflow-x', 'auto');
+                                }, this);
+                            }
+                        }
+                    }]
+                }]
+            });
+
+            // State variables
+            var selectedEntity = '';
+            var page = 1;
+            var pageSize = 1000;
+            var minPage = 1;
+            var maxPage = 1;
+
+            // Get references to components
+            var grid = Ext.ComponentQuery.query('#dataGrid')[0];
+            var errorMessage = Ext.ComponentQuery.query('#errorMessage')[0];
+            var pagingToolbar = Ext.ComponentQuery.query('#pagingToolbar')[0];
+            var prevButton = Ext.ComponentQuery.query('#prevButton')[0];
+            var nextButton = Ext.ComponentQuery.query('#nextButton')[0];
+            var pageInfo = Ext.ComponentQuery.query('#pageInfo')[0];
+
+            // Select an entity and fetch data
+            function selectEntity(entity) {
+                selectedEntity = entity;
+                setInitialPage();
+                grid.setColumns(columns[entity] || []);
+                grid.setHidden(false);
+                fetchData();
+            }
+
+            // Set initial page and pagination range
+            function setInitialPage() {
+                page = selectedEntity === 'Products' ? 3 : 1;
+                var pageRange = getPageRange();
+                minPage = pageRange.min;
+                maxPage = pageRange.max;
+                updatePagingToolbar();
+            }
+
+            // Get pagination range for the selected entity
+            function getPageRange() {
+                switch (selectedEntity) {
+                    case 'Products':
+                        return { min: 3, max: 5 };
+                    case 'Customers':
+                        return { min: 1, max: 13 };
+                    case 'Inventory':
+                        return { min: 1, max: 15 };
+                    case 'Suppliers':
+                        return { min: 1, max: 10 };
+                    default:
+                        return { min: 1, max: 1 }; // Orders doesn't use pagination
+                }
+            }
+
+            // Fetch data from the backend API
+            function fetchData() {
+                errorMessage.setHtml('');
+                errorMessage.setHidden(true);
+
+                var url = 'http://localhost:5189/api/' + selectedEntity;
+                if (selectedEntity !== 'Orders') {
+                    url += '?page=' + page;
+                }
+
+                store.getProxy().setUrl(url);
+                store.load({
+                    callback: function (records, operation, success) {
+                        if (!success) {
+                            var errorMsg = 'Failed to fetch ' + selectedEntity + ': ' + (operation.getError() || 'Unknown error');
+                            errorMessage.setHtml(errorMsg);
+                            errorMessage.setHidden(false);
+                            grid.getStore().removeAll();
+                        }
+                        updatePagingToolbar();
+                    }
+                });
+            }
+
+            // Pagination controls
+            function previousPage() {
+                if (page > minPage) {
+                    page--;
+                    fetchData();
+                }
+            }
+
+            function nextPage() {
+                if (page < maxPage && grid.getStore().getCount() === pageSize) {
+                    page++;
+                    fetchData();
+                }
+            }
+
+            // Update pagination toolbar
+            function updatePagingToolbar() {
+                if (selectedEntity === 'Orders') {
+                    pagingToolbar.setHidden(true);
+                } else {
+                    pagingToolbar.setHidden(false);
+                    prevButton.setDisabled(page <= minPage);
+                    nextButton.setDisabled(page >= maxPage || grid.getStore().getCount() < pageSize);
+                    pageInfo.setText('Page ' + page + ' of ' + maxPage);
+                }
+            }
+        });
+    </script>
+</body>
+
+</html>

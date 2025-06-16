@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Large Scale App (Ext JS)</title>
+
+    <!-- ✅ Ext JS 6.2 GPL from CDN -->
+    <link rel="stylesheet" href="https://cdn.sencha.com/ext/gpl/6.2.0/build/classic/theme-crisp/resources/theme-crisp-all.css">
+    <script src="https://cdn.sencha.com/ext/gpl/6.2.0/build/ext-all.js"></script>
+    <script src="https://cdn.sencha.com/ext/gpl/6.2.0/build/classic/theme-crisp/theme-crisp.js"></script>
+
+    <style>
+        .button-container {
+            margin: 10px 0;
+        }
+        .error-message {
+            color: red;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+<script>
+Ext.onReady(function () {
+    var columns = {
+        Inventory: [
+            { text: 'ID', dataIndex: 'id', width: 90 },
+            { text: 'Product ID', dataIndex: 'productId', width: 120 },
+            { text: 'Quantity', dataIndex: 'quantity', width: 120 },
+            { text: 'Stock Status', dataIndex: 'stockStatus', width: 120 },
+            { text: 'Unit Cost', dataIndex: 'unitCost', width: 120 }
+        ],
+        Suppliers: [
+            { text: 'ID', dataIndex: 'id', width: 90 },
+            { text: 'Company Name', dataIndex: 'companyName', width: 150 },
+            { text: 'Email', dataIndex: 'email', width: 200 },
+            { text: 'Phone', dataIndex: 'phone', width: 150 },
+            { text: 'Country', dataIndex: 'country', width: 120 }
+        ]
+    };
+
+    // Dummy data store
+    var store = Ext.create('Ext.data.Store', {
+        fields: ['id', 'productId', 'quantity', 'stockStatus', 'unitCost', 'companyName', 'email', 'phone', 'country'],
+        data: [] // initially empty
+    });
+
+    // Create app layout
+    Ext.create('Ext.container.Viewport', {
+        layout: 'fit',
+        items: [{
+            xtype: 'panel',
+            title: 'Large Scale App (Ext JS)',
+            layout: 'vbox',
+            items: [{
+                xtype: 'container',
+                cls: 'button-container',
+                items: [{
+                    xtype: 'button',
+                    text: 'Inventory',
+                    margin: '0 5 0 0',
+                    handler: function () {
+                        selectEntity('Inventory');
+                    }
+                }, {
+                    xtype: 'button',
+                    text: 'Suppliers',
+                    handler: function () {
+                        selectEntity('Suppliers');
+                    }
+                }]
+            }, {
+                xtype: 'component',
+                itemId: 'errorMessage',
+                cls: 'error-message',
+                hidden: true,
+                html: ''
+            }, {
+                xtype: 'grid',
+                itemId: 'dataGrid',
+                store: store,
+                columns: [],
+                height: 500,
+                width: '100%',
+                hidden: true
+            }]
+        }]
+    });
+
+    var grid = Ext.ComponentQuery.query('#dataGrid')[0];
+
+    function selectEntity(entity) {
+        grid.setColumns(columns[entity] || []);
+        grid.setHidden(false);
+
+        // Load dummy data
+        if (entity === 'Inventory') {
+            store.loadData([
+                { id: 1, productId: 'P100', quantity: 50, stockStatus: 'In Stock', unitCost: 10.5 },
+                { id: 2, productId: 'P101', quantity: 0, stockStatus: 'Out of Stock', unitCost: 9.8 }
+            ]);
+        } else if (entity === 'Suppliers') {
+            store.loadData([
+                { id: 1, companyName: 'Acme Corp', email: 'info@acme.com', phone: '123-456-7890', country: 'USA' },
+                { id: 2, companyName: 'Globex Ltd', email: 'sales@globex.com', phone: '987-654-3210', country: 'UK' }
+            ]);
+        }
+    }
+});
+</script>
+</body>
+</html>

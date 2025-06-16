@@ -1,0 +1,30 @@
+Ext.define('LargeScaleApp.model.Supplier', {
+    extend: 'Ext.data.Model',
+    fields: [
+        { name: 'id', type: 'int' },
+        { name: 'companyName', type: 'string' },
+        { name: 'contactName', type: 'string' },
+        { name: 'email', type: 'string' },
+        { name: 'phone', type: 'string' },
+        { name: 'addressLine1', type: 'string' },
+        { name: 'addressLine2', type: 'string' },
+        { name: 'city', type: 'string' },
+        { name: 'state', type: 'string' },
+        { name: 'zipCode', type: 'string' },
+        { name: 'country', type: 'string' },
+        { name: 'createdDate', type: 'date', dateFormat: 'c' },
+        { name: 'lastUpdated', type: 'date', dateFormat: 'c' },
+        { name: 'isActive', type: 'boolean' },
+        { name: 'supplierType', type: 'string' },
+        { name: 'leadTimeDays', type: 'int' },
+        { name: 'minOrderQuantity', type: 'int' },
+        { name: 'maxOrderQuantity', type: 'int' },
+        { name: 'paymentTerms', type: 'string' },
+        { name: 'taxId', type: 'string' },
+        { name: 'website', type: 'string' },
+        { name: 'rating', type: 'float' },
+        { name: 'contractStartDate', type: 'date', dateFormat: 'c' },
+        { name: 'contractEndDate', type: 'date', dateFormat: 'c' },
+        { name: 'notes', type: 'string' }
+    ]
+});

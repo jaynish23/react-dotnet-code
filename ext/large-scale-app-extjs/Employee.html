@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ext JS Grid with Pagination</title>
+    
+    <link rel="stylesheet" href="/ext-all.css">
+    <!-- Include Ext JS JS -->
+    <script src="/ext-all-debug.js"></script>
+    <style>
+       
+        #grid-container {
+            width: 100%;
+            height: 400px;
+            margin: 0 auto;
+        }
+    </style>
+</head>
+<body>
+   Hello
+    <div id="grid-container"></div>
+
+    <script>
+        Ext.application({
+            name: 'MyApp',
+            launch: function () {
+                
+                Ext.define('Employee', {
+                    extend: 'Ext.data.Model',
+                    fields: ['id', 'name', 'age', 'department']
+                });
+
+                
+                var employeeStore = Ext.create('Ext.data.Store', {
+                    model: 'Employee',
+                    pageSize: 10, // Set page size
+                    proxy: {
+                        type: 'ajax',
+                        url: 'data.json', 
+                        reader: {
+                            type: 'json',
+                            rootProperty: 'data', 
+                            totalProperty: 'total'
+                        }
+                    },
+                    autoLoad: true
+                });
+
+                
+                Ext.create('Ext.grid.Panel', {
+                    title: 'Employee Grid',
+                    store: employeeStore,
+                    width: '100%',
+                    height: 400,
+                    renderTo: Ext.getCmp('grid-container'), 
+                    columns: [
+                        { text: 'ID', dataIndex: 'id', width: 50 },
+                        { text: 'Name', dataIndex: 'name', flex: 1 },
+                        { text: 'Age', dataIndex: 'age', width: 100 },
+                        { text: 'Department', dataIndex: 'department', width: 150 }
+                    ],
+                    bbar: {
+                        xtype: 'pagingtoolbar',
+                        store: employeeStore, 
+                        displayInfo: true 
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>

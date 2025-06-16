@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Ext JS Dynamic Tooltip Example</title>
+    <meta charset="UTF-8">
+
+    <!-- Ext JS CDN -->
+    <link rel="stylesheet" href="./ext-all-gray.css">
+    <script type="text/javascript" src="./ext-all-debug.js"></script>
+
+    <style>
+        .dynamic-tooltip {
+            font-size: 16px;
+            padding: 10px;
+            max-width: 400px;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+
+        body {
+            padding: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Plain HTML Input Placeholder -->
+    <div id="input-container"></div>
+
+    <script type="text/javascript">
+        Ext.onReady(function () {
+            // Convert the HTML container into an Ext JS TextField
+            var textField = Ext.create('Ext.form.field.Text', {
+                fieldLabel: 'Username',
+                labelAlign: 'top',
+                width: 400,
+                renderTo: 'input-container',
+                listeners: {
+                    render: function (field) {
+                        // Create dynamic tooltip
+                        const tip = Ext.create('Ext.tip.ToolTip', {
+                            target: field.getEl(),
+                            html: 'Start typing...',
+                            trackMouse: true,
+                            autoHide: false,
+                            dismissDelay: 0,
+                            showDelay: 100,
+                            cls: 'dynamic-tooltip'
+                        });
+
+                        // Show tooltip on hover
+                        field.getEl().on('mouseenter', function () {
+                            tip.show();
+                        });
+
+                        // Hide tooltip on mouse leave
+                        field.getEl().on('mouseleave', function () {
+                            tip.hide();
+                        });
+
+                        // Real-time tooltip update on typing
+                        field.inputEl.on('input', function () {
+                            const value = field.getValue();
+                            tip.update(value || 'Start typing...');
+                        });
+                    }
+
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>

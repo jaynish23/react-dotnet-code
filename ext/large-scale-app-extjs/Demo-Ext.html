@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ext JS Example (CDN from cdnjs)</title>
+    
+    
+    <link rel="stylesheet" href="./ext-all-brown.css" />
+    <script src="./ext-all-debug.js"></script>
+    
+
+</head>
+<body>
+
+
+    <style>
+   .dynamic-tooltip {
+    font-size: 16px;
+    padding: 10px;
+    max-width: 400px;
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+
+
+    </style>
+    <div id="buttonContainer"></div>
+    z
+    <script>
+        Ext.onReady(function() {
+            Ext.create('Ext.Button', {
+                text: 'Click Me',
+                renderTo: 'buttonContainer',
+                handler: function() {
+                    alert('Button Clicked!');
+                }
+            }),
+            Ext.create('Ext.Button',{
+                    text:'This is Button',
+                    renderTo: Ext.getBody(),
+                    handler:function(){
+                        alert('Button is created by Harsh')
+                    }
+            }
+        ),
+        Ext.create('Ext.Panel',{
+            title:'Panel Title',
+            width:300,
+            height:200,
+            html:'<p>This is Panel Which is wriiten in p tage inside Ext html attribute.</p>',
+            renderTo:Ext.getBody()
+        }),
+        Ext.create('Ext.form.field.Text',{
+            fieldLabel:'Name',
+            renderTo:Ext.getBody()
+        }),
+        Ext.create('Ext.grid.Panel',{
+            title:'Simple Grid',
+            store:{
+                fields:['name','age'],
+                data:[{name:'Harsh' ,age:30},
+                {name:'Pranjal' ,age:34},
+                ]
+            },
+            columns:[
+                {text:'Name', dataIndex:'name'},
+                {text:'Age', dataIndex:'age'}
+            ],
+            renderTo:Ext.getBody()
+        }),
+        Ext.create('Ext.form.Panel', {
+    title: 'User Form',
+    bodyPadding: 10,
+    items: [
+        {
+            xtype: 'textfield',
+            fieldLabel: 'Username',
+            name: 'username',
+            listeners: {
+                render: function (field) {
+                    // Create tooltip
+                    const tip = Ext.create('Ext.tip.ToolTip', {
+                        target: field.getEl(),
+                        html: 'Start typing...',
+                        trackMouse: true,
+                        autoHide: false,
+                        dismissDelay: 0,
+                        showDelay: 100,
+                        cls: 'dynamic-tooltip'
+                    });
+
+                    // Show tooltip on hover
+                    field.getEl().on('mouseenter', function () {
+                        tip.show();
+                    });
+
+                    // Hide tooltip on mouse leave
+                    field.getEl().on('mouseleave', function () {
+                        tip.hide();
+                    });
+
+                    // Listen for real-time input
+                    field.inputEl.on('input', function () {
+                        const value = field.getValue();
+                        tip.setHtml(value || 'Start typing...');
+                    });
+                }
+            }
+        }
+    ],
+    renderTo: Ext.getBody()
+});
+
+});
+
+
+    </script>
+</body>
+</html>
