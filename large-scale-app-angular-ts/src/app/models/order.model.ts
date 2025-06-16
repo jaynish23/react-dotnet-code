@@ -1,0 +1,32 @@
+export interface OrderDto {
+  id: number;
+  orderDate: string;
+  customerId: number;
+  totalAmount: number;
+  status: string | null;
+  shippingAddress: string | null;
+  billingAddress: string | null;
+  paymentMethod: string | null;
+  orderNumber: string | null;
+  expectedDelivery: string | null;
+  actualDelivery: string | null;
+  isDelivered: boolean;
+  taxAmount: number;
+  discountAmount: number;
+  shippingCost: number;
+  orderNotes: string | null;
+  createdBy: string | null;
+  modifiedBy: string | null;
+  createdDate: string;
+  modifiedDate: string;
+  customerEmail: string | null;
+  customerPhone: string | null;
+  orderPriority: string | null;
+  shippingMethod: string | null;
+  trackingNumber: string | null;
+  couponCode: string | null;
+  isGift: boolean;
+  giftMessage: string | null;
+  salesChannel: string | null;
+  orderWeight: number;
+}

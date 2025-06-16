@@ -1,0 +1,13 @@
+<div class="app-container">
+  <mat-toolbar color="primary">
+    <span>Large Scale App</span>
+  </mat-toolbar>
+  <div class="button-group">
+    <button mat-raised-button (click)="setEntity('Products')">Products</button>
+    <button mat-raised-button (click)="setEntity('Orders')">Orders</button>
+    <button mat-raised-button (click)="setEntity('Customers')">Customers</button>
+    <button mat-raised-button (click)="setEntity('Inventory')">Inventory</button>
+    <button mat-raised-button (click)="setEntity('Suppliers')">Suppliers</button>
+  </div>
+  <app-data-grid [entity]="entity"></app-data-grid>
+</div>

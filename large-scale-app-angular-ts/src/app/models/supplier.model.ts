@@ -1,0 +1,30 @@
+export interface SupplierDto {
+  id: number;
+  companyName: string | null;
+  contactName: string | null;
+  email: string | null;
+  phone: string | null;
+  addressLine1: string | null;
+  addressLine2: string | null;
+  city: string | null;
+  state: string | null;
+  zipCode: string | null;
+  country: string | null;
+  createdDate: string;
+  lastUpdated: string;
+  isActive: boolean;
+  supplierType: string | null;
+  leadTimeDays: number;
+  minOrderQuantity: number;
+  maxOrderQuantity: number;
+  paymentTerms: string | null;
+  taxId: string | null;
+  website: string | null;
+  rating: number;
+  contractStartDate: string | null;
+  contractEndDate: string | null;
+  notes: string | null;
+  preferredContactMethod: string | null;
+  lastOrderDate: string | null;
+  supplierCategory: string | null;
+}
