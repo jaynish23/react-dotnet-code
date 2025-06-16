@@ -1,0 +1,12 @@
+{
+  "Version": 1,
+  "Hash": "yLkS/C4bZs2ddXul1ptecr3fms2cJxRnf8FXDCtfIac=",
+  "Source": "LargeScaleApp.Api",
+  "BasePath": "_content/LargeScaleApp.Api",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [],
+  "Assets": [],
+  "Endpoints": []
+}

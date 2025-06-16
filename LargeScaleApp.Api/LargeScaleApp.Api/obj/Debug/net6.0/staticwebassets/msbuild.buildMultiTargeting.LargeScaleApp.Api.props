@@ -1,0 +1,3 @@
+﻿<Project>
+  <Import Project="..\build\LargeScaleApp.Api.props" />
+</Project>
