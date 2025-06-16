@@ -1,2 +1,6 @@
 hi
+mkdir J:\Angular-dotnet\large-scale-app-extjs
+>> cd J:\Angular-dotnet\large-scale-app-extjs
 
+npm install -g http-server
+ http-server -p 4201
