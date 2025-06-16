@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html ng-app="largeScaleApp">
+
+<head>
+    <title>Large Scale App (AngularJS)</title>
+    <!-- AngularJS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.8.3/angular.min.js"></script>
+    <!-- ui-grid -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/angular-ui-grid/4.11.1/ui-grid.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/angular-ui-grid/4.11.1/ui-grid.min.css">
+    <!-- Angular Material (for buttons and spinner) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/angular-material/1.2.5/angular-material.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/angular-animate/1.8.3/angular-animate.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/angular-aria/1.8.3/angular-aria.min.js"></script>
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/angular-material/1.2.5/angular-material.min.css">
+    <!-- Custom Styles -->
+    <style>
+        body {
+            padding: 20px;
+            font-family: Arial, sans-serif;
+        }
+
+        .button-container {
+            margin-bottom: 20px;
+        }
+
+        .button-container md-button {
+            margin: 5px;
+        }
+
+        .grid-container {
+            width: 100%;
+            height: 600px;
+            overflow-x: auto;
+        }
+
+        .error-message {
+            color: red;
+            margin-bottom: 10px;
+        }
+
+        .loading-spinner {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+        }
+    </style>
+</head>
+
+<body ng-controller="MainController">
+    <div class="button-container">
+        <md-button class="md-raised md-primary" ng-click="selectEntity('Products')">Products</md-button>
+        <md-button class="md-raised md-primary" ng-click="selectEntity('Orders')">Orders</md-button>
+        <md-button class="md-raised md-primary" ng-click="selectEntity('Customers')">Customers</md-button>
+        <md-button class="md-raised md-primary" ng-click="selectEntity('Inventory')">Inventory</md-button>
+        <md-button class="md-raised md-primary" ng-click="selectEntity('Suppliers')">Suppliers</md-button>
+    </div>
+
+    <div ng-if="selectedEntity">
+        <div class="error-message" ng-if="error">{{ error }}</div>
+        <div class="loading-spinner" ng-if="loading">
+            <md-progress-circular></md-progress-circular>
+        </div>
+        <div ng-if="!loading">
+            <div class="grid-container" ui-grid="gridOptions" ui-grid-auto-resize></div>
+            <div ng-if="selectedEntity !== 'Orders'">
+                <md-button class="md-raised md-primary" ng-click="previousPage()"
+                    ng-disabled="page <= minPage">Previous</md-button>
+                <md-button class="md-raised md-primary" ng-click="nextPage()"
+                    ng-disabled="page >= maxPage || gridOptions.data.length < pageSize">Next</md-button>
+                <span>Page {{ page }} of {{ maxPage }}</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Define the AngularJS module
+        angular.module('largeScaleApp', ['ui.grid', 'ngMaterial'])
+            .controller('MainController', ['$scope', '$http', function ($scope, $http) {
+                // Initial state
+                $scope.selectedEntity = '';
+                $scope.loading = false;
+                $scope.error = null;
+                $scope.page = 1;
+                $scope.pageSize = 1000;
+                $scope.minPage = 1;
+                $scope.maxPage = 1;
+                $scope.gridOptions = {
+                    data: [],
+                    enableSorting: true,
+                    enableHorizontalScrolling: true
+                };
+
+                // Column definitions for each entity
+                $scope.columns = {
+                    Products: [
+                        { field: 'id', displayName: 'ID', width: 90 },
+                        { field: 'productName', displayName: 'Product Name', width: 150 },
+                        { field: 'category', displayName: 'Category', width: 150 },
+                        { field: 'price', displayName: 'Price', width: 120 },
+                        { field: 'stock', displayName: 'Stock', width: 100 },
+                        { field: 'createdDate', displayName: 'Created Date', width: 150 },
+                        { field: 'lastUpdated', displayName: 'Last Updated', width: 150 },
+                        { field: 'description', displayName: 'Description', width: 200 },
+                        { field: 'manufacturer', displayName: 'Manufacturer', width: 150 },
+                        { field: 'sku', displayName: 'SKU', width: 120 },
+                        { field: 'weight', displayName: 'Weight', width: 100 },
+                        { field: 'dimensions', displayName: 'Dimensions', width: 150 },
+                        { field: 'color', displayName: 'Color', width: 120 },
+                        { field: 'material', displayName: 'Material', width: 120 },
+                        { field: 'warrantyMonths', displayName: 'Warranty Months', width: 120 },
+                        { field: 'isActive', displayName: 'Is Active', width: 100 },
+                        { field: 'rating', displayName: 'Rating', width: 100 },
+                        { field: 'discount', displayName: 'Discount', width: 100 },
+                        { field: 'supplierId', displayName: 'Supplier ID', width: 100 },
+                        { field: 'batchNumber', displayName: 'Batch Number', width: 120 },
+                        { field: 'expiryDate', displayName: 'Expiry Date', width: 150 },
+                        { field: 'countryOfOrigin', displayName: 'Country of Origin', width: 150 },
+                        { field: 'isFeatured', displayName: 'Is Featured', width: 100 },
+                        { field: 'maxOrderQuantity', displayName: 'Max Order Quantity', width: 120 },
+                        { field: 'leadTimeDays', displayName: 'Lead Time Days', width: 120 }
+                    ],
+                    Orders: [
+                        { field: 'id', displayName: 'ID', width: 90 },
+                        { field: 'orderDate', displayName: 'Order Date', width: 150 },
+                        { field: 'customerId', displayName: 'Customer ID', width: 120 },
+                        { field: 'totalAmount', displayName: 'Total Amount', width: 120 },
+                        { field: 'status', displayName: 'Status', width: 120 },
+                        { field: 'shippingAddress', displayName: 'Shipping Address', width: 200 },
+                        { field: 'billingAddress', displayName: 'Billing Address', width: 200 },
+                        { field: 'paymentMethod', displayName: 'Payment Method', width: 150 },
+                        { field: 'orderNumber', displayName: 'Order Number', width: 120 },
+                        { field: 'expectedDelivery', displayName: 'Expected Delivery', width: 150 },
+                        { field: 'actualDelivery', displayName: 'Actual Delivery', width: 150 },
+                        { field: 'isDelivered', displayName: 'Is Delivered', width: 100 },
+                        { field: 'taxAmount', displayName: 'Tax Amount', width: 120 },
+                        { field: 'discountAmount', displayName: 'Discount Amount', width: 120 },
+                        { field: 'shippingCost', displayName: 'Shipping Cost', width: 120 },
+                        { field: 'orderNotes', displayName: 'Order Notes', width: 200 },
+                        { field: 'createdBy', displayName: 'Created By', width: 150 },
+                        { field: 'modifiedBy', displayName: 'Modified By', width: 150 },
+                        { field: 'createdDate', displayName: 'Created Date', width: 150 },
+                        { field: 'modifiedDate', displayName: 'Modified Date', width: 150 },
+                        { field: 'customerEmail', displayName: 'Customer Email', width: 200 },
+                        { field: 'customerPhone', displayName: 'Customer Phone', width: 150 },
+                        { field: 'orderPriority', displayName: 'Order Priority', width: 120 },
+                        { field: 'shippingMethod', displayName: 'Shipping Method', width: 150 },
+                        { field: 'trackingNumber', displayName: 'Tracking Number', width: 150 },
+                        { field: 'couponCode', displayName: 'Coupon Code', width: 120 },
+                        { field: 'isGift', displayName: 'Is Gift', width: 100 },
+                        { field: 'giftMessage', displayName: 'Gift Message', width: 200 },
+                        { field: 'salesChannel', displayName: 'Sales Channel', width: 150 },
+                        { field: 'orderWeight', displayName: 'Order Weight', width: 120 }
+                    ],
+                    Customers: [
+                        { field: 'id', displayName: 'ID', width: 90 },
+                        { field: 'firstName', displayName: 'First Name', width: 150 },
+                        { field: 'lastName', displayName: 'Last Name', width: 150 },
+                        { field: 'email', displayName: 'Email', width: 200 },
+                        { field: 'phone', displayName: 'Phone', width: 150 },
+                        { field: 'addressLine1', displayName: 'Address Line 1', width: 200 },
+                        { field: 'addressLine2', displayName: 'Address Line 2', width: 200 },
+                        { field: 'city', displayName: 'City', width: 120 },
+                        { field: 'state', displayName: 'State', width: 120 },
+                        { field: 'zipCode', displayName: 'Zip Code', width: 120 },
+                        { field: 'country', displayName: 'Country', width: 120 },
+                        { field: 'createdDate', displayName: 'Created Date', width: 150 },
+                        { field: 'lastUpdated', displayName: 'Last Updated', width: 150 },
+                        { field: 'isActive', displayName: 'Is Active', width: 100 },
+                        { field: 'dateOfBirth', displayName: 'Date of Birth', width: 150 },
+                        { field: 'gender', displayName: 'Gender', width: 100 },
+                        { field: 'occupation', displayName: 'Occupation', width: 150 },
+                        { field: 'companyName', displayName: 'Company Name', width: 150 },
+                        { field: 'annualIncome', displayName: 'Annual Income', width: 120 },
+                        { field: 'customerType', displayName: 'Customer Type', width: 120 },
+                        { field: 'loyaltyPoints', displayName: 'Loyalty Points', width: 120 },
+                        { field: 'lastPurchaseDate', displayName: 'Last Purchase Date', width: 150 },
+                        { field: 'newsletterSubscribed', displayName: 'Newsletter Subscribed', width: 120 },
+                        { field: 'preferredContactMethod', displayName: 'Preferred Contact Method', width: 150 },
+                        { field: 'accountStatus', displayName: 'Account Status', width: 120 },
+                        { field: 'creditLimit', displayName: 'Credit Limit', width: 120 },
+                        { field: 'billingAddress', displayName: 'Billing Address', width: 200 },
+                        { field: 'shippingAddress', displayName: 'Shipping Address', width: 200 },
+                        { field: 'taxId', displayName: 'Tax ID', width: 120 },
+                        { field: 'customerSegment', displayName: 'Customer Segment', width: 120 },
+                        { field: 'registrationDate', displayName: 'Registration Date', width: 150 },
+                        { field: 'lastLoginDate', displayName: 'Last Login Date', width: 150 },
+                        { field: 'preferredLanguage', displayName: 'Preferred Language', width: 120 },
+                        { field: 'timeZone', displayName: 'Time Zone', width: 120 },
+                        { field: 'notes', displayName: 'Notes', width: 200 },
+                        { field: 'emergencyContact', displayName: 'Emergency Contact', width: 150 },
+                        { field: 'emergencyPhone', displayName: 'Emergency Phone', width: 150 },
+                        { field: 'referralSource', displayName: 'Referral Source', width: 150 },
+                        { field: 'socialMediaHandle', displayName: 'Social Media Handle', width: 150 },
+                        { field: 'website', displayName: 'Website', width: 200 },
+                        { field: 'fax', displayName: 'Fax', width: 120 },
+                        { field: 'isVerified', displayName: 'Is Verified', width: 100 },
+                        { field: 'verificationDate', displayName: 'Verification Date', width: 150 },
+                        { field: 'lastContacted', displayName: 'Last Contacted', width: 150 },
+                        { field: 'customerRating', displayName: 'Customer Rating', width: 120 }
+                    ],
+                    Inventory: [
+                        { field: 'id', displayName: 'ID', width: 90 },
+                        { field: 'productId', displayName: 'Product ID', width: 120 },
+                        { field: 'warehouseId', displayName: 'Warehouse ID', width: 120 },
+                        { field: 'quantity', displayName: 'Quantity', width: 120 },
+                        { field: 'lastUpdated', displayName: 'Last Updated', width: 150 },
+                        { field: 'stockStatus', displayName: 'Stock Status', width: 120 },
+                        { field: 'reorderLevel', displayName: 'Reorder Level', width: 120 },
+                        { field: 'reorderQuantity', displayName: 'Reorder Quantity', width: 120 },
+                        { field: 'lastRestockDate', displayName: 'Last Restock Date', width: 150 },
+                        { field: 'supplierId', displayName: 'Supplier ID', width: 120 },
+                        { field: 'batchNumber', displayName: 'Batch Number', width: 120 },
+                        { field: 'expiryDate', displayName: 'Expiry Date', width: 150 },
+                        { field: 'storageLocation', displayName: 'Storage Location', width: 150 },
+                        { field: 'unitCost', displayName: 'Unit Cost', width: 120 },
+                        { field: 'totalCost', displayName: 'Total Cost', width: 120 },
+                        { field: 'isDamaged', displayName: 'Is Damaged', width: 100 },
+                        { field: 'damageNotes', displayName: 'Damage Notes', width: 200 },
+                        { field: 'lastAuditDate', displayName: 'Last Audit Date', width: 150 },
+                        { field: 'auditStatus', displayName: 'Audit Status', width: 120 },
+                        { field: 'inventoryType', displayName: 'Inventory Type', width: 120 }
+                    ],
+                    Suppliers: [
+                        { field: 'id', displayName: 'ID', width: 90 },
+                        { field: 'companyName', displayName: 'Company Name', width: 150 },
+                        { field: 'contactName', displayName: 'Contact Name', width: 150 },
+                        { field: 'email', displayName: 'Email', width: 200 },
+                        { field: 'phone', displayName: 'Phone', width: 150 },
+                        { field: 'addressLine1', displayName: 'Address Line 1', width: 200 },
+                        { field: 'addressLine2', displayName: 'Address Line 2', width: 200 },
+                        { field: 'city', displayName: 'City', width: 120 },
+                        { field: 'state', displayName: 'State', width: 120 },
+                        { field: 'zipCode', displayName: 'Zip Code', width: 120 },
+                        { field: 'country', displayName: 'Country', width: 120 },
+                        { field: 'createdDate', displayName: 'Created Date', width: 150 },
+                        { field: 'lastUpdated', displayName: 'Last Updated', width: 150 },
+                        { field: 'isActive', displayName: 'Is Active', width: 100 },
+                        { field: 'supplierType', displayName: 'Supplier Type', width: 120 },
+                        { field: 'leadTimeDays', displayName: 'Lead Time Days', width: 120 },
+                        { field: 'minOrderQuantity', displayName: 'Min Order Quantity', width: 120 },
+                        { field: 'maxOrderQuantity', displayName: 'Max Order Quantity', width: 120 },
+                        { field: 'paymentTerms', displayName: 'Payment Terms', width: 150 },
+                        { field: 'taxId', displayName: 'Tax ID', width: 120 },
+                        { field: 'website', displayName: 'Website', width: 200 },
+                        { field: 'rating', displayName: 'Rating', width: 100 },
+                        { field: 'contractStartDate', displayName: 'Contract Start Date', width: 150 },
+                        { field: 'contractEndDate', displayName: 'Contract End Date', width: 150 },
+                        { field: 'notes', displayName: 'Notes', width: 200 },
+                        { field: 'preferredContactMethod', displayName: 'Preferred Contact Method', width: 150 },
+                        { field: 'lastOrderDate', displayName: 'Last Order Date', width: 150 },
+                        { field: 'supplierCategory', displayName: 'Supplier Category', width: 150 }
+                    ]
+                };
+
+                // Select an entity and fetch data
+                $scope.selectEntity = function (entity) {
+                    $scope.selectedEntity = entity;
+                    $scope.setInitialPage();
+                    $scope.gridOptions.columnDefs = $scope.columns[entity] || [];
+                    $scope.fetchData();
+                };
+
+                // Set initial page and pagination range
+                $scope.setInitialPage = function () {
+                    $scope.page = $scope.selectedEntity === 'Products' ? 3 : 1;
+                    var pageRange = $scope.getPageRange();
+                    $scope.minPage = pageRange.min;
+                    $scope.maxPage = pageRange.max;
+                };
+
+                // Get pagination range for the selected entity
+                $scope.getPageRange = function () {
+                    switch ($scope.selectedEntity) {
+                        case 'Products':
+                            return { min: 3, max: 5 };
+                        case 'Customers':
+                            return { min: 1, max: 13 };
+                        case 'Inventory':
+                            return { min: 1, max: 15 };
+                        case 'Suppliers':
+                            return { min: 1, max: 10 };
+                        default:
+                            return { min: 1, max: 1 }; // Orders doesn't use pagination
+                    }
+                };
+
+                // Fetch data from the backend API
+                $scope.fetchData = function () {
+                    $scope.loading = true;
+                    $scope.error = null;
+                    var url = 'http://localhost:5189/api/' + $scope.selectedEntity;
+                    if ($scope.selectedEntity !== 'Orders') {
+                        url += '?page=' + $scope.page;
+                    }
+
+                    $http.get(url)
+                        .then(function (response) {
+                            $scope.gridOptions.data = response.data;
+                            $scope.loading = false;
+                        }, function (error) {
+                            $scope.error = 'Failed to fetch ' + $scope.selectedEntity + ': ' + (error.statusText || 'Unknown error') + ' (Status: ' + error.status + ')';
+                            $scope.gridOptions.data = [];
+                            $scope.loading = false;
+                        });
+                };
+
+                // Pagination controls
+                $scope.previousPage = function () {
+                    if ($scope.page > $scope.minPage) {
+                        $scope.page--;
+                        $scope.fetchData();
+                    }
+                };
+
+                $scope.nextPage = function () {
+                    if ($scope.page < $scope.maxPage && $scope.gridOptions.data.length === $scope.pageSize) {
+                        $scope.page++;
+                        $scope.fetchData();
+                    }
+                };
+            }]);
+    </script>
+</body>
+
+</html>
